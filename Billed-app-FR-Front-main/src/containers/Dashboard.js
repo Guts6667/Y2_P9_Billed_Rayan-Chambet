@@ -84,25 +84,37 @@ export default class {
     $('#modaleFileAdmin1').find(".modal-body").html(`<div style='text-align: center;'><img width=${imgWidth} src=${billUrl} alt="Bill"/></div>`)
     if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show')
   }
-
+ // Mes bills refusées sont appelés deux fois
+ // Il semblerait que lorsque le bug se produit, la fonction qui permet de fermer le ticket est appelée directement
+ // lorsqu'on essaie de l'ouvrir
+ // Problème entre lignes 98 et 110
   handleEditTicket(e, bill, bills) {
+    //bug4
+    e.stopImmediatePropagation();
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     if (this.counter % 2 === 0) {
+      console.log(bills);
       bills.forEach(b => {
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
       })
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
       $('.vertical-navbar').css({ height: '150vh' })
+    
       this.counter ++
+      console.log(bill);
     } else {
+      
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
+      // ----------------------------
       $('.dashboard-right-container div').html(`
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `)
+      // ----------------------------
       $('.vertical-navbar').css({ height: '120vh' })
+      console.log(bill);
       this.counter ++
     }
     $('#icon-eye-d').click(this.handleClickIconEye)
@@ -147,6 +159,8 @@ export default class {
 
     bills.forEach(bill => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+      
+      
     })
 
     return bills
@@ -155,6 +169,7 @@ export default class {
 
   getBillsAllUsers = () => {
     if (this.store) {
+      
       return this.store
       .bills()
       .list()
@@ -179,10 +194,14 @@ export default class {
   updateBill = (bill) => {
     if (this.store) {
     return this.store
+    
       .bills()
       .update({data: JSON.stringify(bill), selector: bill.id})
       .then(bill => bill)
       .catch(console.log)
+      
     }
   }
 }
+
+

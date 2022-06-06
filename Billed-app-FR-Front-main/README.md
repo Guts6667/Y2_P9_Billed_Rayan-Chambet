@@ -53,7 +53,7 @@ $ npm install -g live-server
 
 Lancez l'application :
 ```
-$ live-server
+$ live-server ou /Users/rayanchambet/.npm-global/bin/live-server
 ```
 
 Puis allez à l'adresse : `http://127.0.0.1:8080/`
