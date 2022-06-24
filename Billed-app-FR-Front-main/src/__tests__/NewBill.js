@@ -16,3 +16,10 @@ describe("Given I am connected as an employee", () => {
     })
   })
 })
+
+// Test création de nouvelle facture
+// Ajout de fichier
+// Quand connecté sur la page employé, la page devrait contenir: envoyer une note de frais
+// Tester le form
+// Quand j'ajoute une image, l'input doit changer
+// En cliquant sur submit, la bills devrait être envoyée

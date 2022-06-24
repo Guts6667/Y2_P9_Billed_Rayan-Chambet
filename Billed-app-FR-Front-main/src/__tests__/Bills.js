@@ -2,11 +2,15 @@
  * @jest-environment jsdom
  */
 
+
 import {screen, waitFor} from "@testing-library/dom"
+import "@testing-library/jest-dom/extend-expect"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import { ROUTES_PATH} from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
+import  Bills from "../containers/Bills";
+import userEvent from '@testing-library/user-event'
 
 import router from "../app/Router.js";
 
@@ -26,6 +30,8 @@ describe("Given I am connected as an employee", () => {
       await waitFor(() => screen.getByTestId('icon-window'))
       const windowIcon = screen.getByTestId('icon-window')
       //to-do write expect expression
+      expect(windowIcon).toHaveClass('active-icon')
+
 
     })
     test("Then bills should be ordered from earliest to latest", () => {
@@ -37,3 +43,36 @@ describe("Given I am connected as an employee", () => {
     })
   })
 })
+
+describe("Given I am connected as Employee and I am on Bill's Page ", () => {
+  describe('When I click on the icon eye', () => {
+    test('A modal should open', () => {
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      document.body.innerHTML = BillsUI({ data: [bills[0]] })
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+      const store = null
+      const bills1 = new Bills({
+        document, onNavigate, store, localStorage: window.localStorage
+      })
+
+      const handleClickIconEye = jest.fn(bills1.handleClickIconEye)
+      const eye = screen.getByTestId('icon-eye')
+      eye.addEventListener('click', handleClickIconEye)
+      userEvent.click(eye)
+      expect(handleClickIconEye).toHaveBeenCalled()
+
+      const modale = screen.getByTestId('modaleFile')
+      expect(modale).toHaveClass('show');
+    })
+  })
+})
+
+// Problème ici, le getByTestId('modaleFile') n'a pas été reconu puisque c'est un id non pas un data-testid``
+// J'ai ajouté un data-testid à l'élement
+// Il semblerait que le click de l'utilisateur ne soit pas pris en compte lors du test
+// Raison pour laquelle, la classe 'show' n'est pas reconnue
