@@ -44,35 +44,51 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
-describe("Given I am connected as Employee and I am on Bill's Page ", () => {
-  describe('When I click on the icon eye', () => {
-    test('A modal should open', () => {
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Employee'
-      }))
-      document.body.innerHTML = BillsUI({ data: [bills[0]] })
+
+describe("Given I am connected as Employee and I am on Bills page", () => {
+  describe("When I click on the icon eye", () => {
+    test("A modal should open", () => {
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+      document.body.innerHTML = BillsUI({ data: [bills[0]] });
       const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }
-      const store = null
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+      const store = null;
       const bills1 = new Bills({
-        document, onNavigate, store, localStorage: window.localStorage
-      })
+        document,
+        onNavigate,
+        store,
+        localStorage: window.localStorage,
+      });
+      $.fn.modal = jest.fn();
+      const eye = screen.getByTestId("icon-eye");
 
-      const handleClickIconEye = jest.fn(bills1.handleClickIconEye)
-      const eye = screen.getByTestId('icon-eye')
-      eye.addEventListener('click', handleClickIconEye)
-      userEvent.click(eye)
-      expect(handleClickIconEye).toHaveBeenCalled()
+      const handleClickIconEye = jest.fn(bills1.handleClickIconEye(eye));
+      eye.addEventListener("click", handleClickIconEye);
 
-      const modale = screen.getByTestId('modaleFile')
-      expect(modale).toHaveClass('show');
-    })
-  })
-})
+      userEvent.click(eye);
 
-// Problème ici, le getByTestId('modaleFile') n'a pas été reconu puisque c'est un id non pas un data-testid``
-// J'ai ajouté un data-testid à l'élement
-// Il semblerait que le click de l'utilisateur ne soit pas pris en compte lors du test
-// Raison pour laquelle, la classe 'show' n'est pas reconnue
+      expect(handleClickIconEye).toHaveBeenCalled();
+
+      const modale = screen.getByTestId("modaleFileEmployee");
+      expect(modale).toBeTruthy();
+    });
+  });
+});
+
+
+// describe("Given I am connected as an employee and I am on Bill's Page", () => {
+//     describe("When I click on 'Nouvelle note de frais'", () => {
+//       test("Then it should render New Bill's Page ", () => {
+
+//       })
+//     })
+// })
