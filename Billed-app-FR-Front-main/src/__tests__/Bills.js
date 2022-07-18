@@ -42,6 +42,26 @@ describe("Given I am connected as an employee", () => {
       expect(dates).toEqual(datesSorted)
     })
   })
+  describe("When I click on the New bill button", () => {
+    test("Then I should be redirected to new bill form", () => {
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+      const handleClickNewBill = jest.fn(Bills.handleClickNewBill)
+      const newBillButton = screen.getByTestId('btn-new-bill')
+      newBillButton.addEventListener('click', handleClickNewBill)
+      userEvent.click(newBillButton)
+
+      expect(handleClickNewBill).toHaveBeenCalled()
+      expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
+    })
+  })
 })
 
 
@@ -84,11 +104,3 @@ describe("Given I am connected as Employee and I am on Bills page", () => {
   });
 });
 
-
-// describe("Given I am connected as an employee and I am on Bill's Page", () => {
-//     describe("When I click on 'Nouvelle note de frais'", () => {
-//       test("Then it should render New Bill's Page ", () => {
-
-//       })
-//     })
-// })

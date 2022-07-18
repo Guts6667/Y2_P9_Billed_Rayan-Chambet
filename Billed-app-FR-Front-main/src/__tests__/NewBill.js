@@ -2,86 +2,82 @@
  * @jest-environment jsdom
  */
 
- import "@testing-library/jest-dom/extend-expect";
- import { fireEvent, screen } from "@testing-library/dom";
- import store from "../__mocks__/store"
- import Router from "../app/Router.js";
- import { ROUTES, ROUTES_PATH } from "../constants/routes";
- import NewBill from "../containers/NewBill.js";
+import "@testing-library/jest-dom/extend-expect";
+import { fireEvent, screen } from "@testing-library/dom";
+import store from "../__mocks__/store";
+import Router from "../app/Router.js";
+import { ROUTES, ROUTES_PATH } from "../constants/routes";
+import NewBill from "../containers/NewBill.js";
 import NewBillUI from "../views/NewBillUI";
 import BillsUI from "../views/BillsUI.js";
 
+describe("Given I am connected as an employee", () => {
+  describe("When I am on NewBill Page", () => {
+    beforeEach(() => {
+      const user = JSON.stringify({
+        type: "Employee",
+        email: "a@a",
+      });
+      window.localStorage.setItem("user", user);
 
- describe("Given I am connected as an employee", () => {
-   describe("When I am on NewBill Page", () => {
-     beforeEach(() => {
-       const user = JSON.stringify({
-         type: "Employee",
-         email: "a@a",
-       });
-       window.localStorage.setItem("user", user);
- 
-       const pathname = ROUTES_PATH["NewBill"];
-       Object.defineProperty(window, "location", {
-         value: {
-           hash: pathname,
-         },
-       });
- 
-       document.body.innerHTML = `<div id="root"></div>`;
-       Router();
-     });
- 
-     it("Then it should require the input type date", () => {
-       const inputDate = screen.getByTestId("datepicker");
-       expect(inputDate).toBeRequired();
-     });
-     it("Then it should require the input type number amount", () => {
-       const inputAmount = screen.getByTestId("amount");
-       expect(inputAmount).toBeRequired();
-     });
-     it("Then it should require the input type number pct", () => {
-       const inputPct = screen.getByTestId("pct");
-       expect(inputPct).toBeRequired();
-     });
-     it("Then it should require the input type file", () => {
-       const inputfile = screen.getByTestId("file");
-       expect(inputfile).toBeRequired();
-     });
-     
-   });
+      const pathname = ROUTES_PATH["NewBill"];
+      Object.defineProperty(window, "location", {
+        value: {
+          hash: pathname,
+        },
+      });
 
- 
-   describe("When I fill the form", () => {
-     it("Then it should not be submitted if the format is incorrect", async () => {
-       const onNavigate = (pathname) => {
-         document.body.innerHTML = ROUTES({ pathname });
-       };
- 
-       const myNewBill = new NewBill({
-         document,
-         onNavigate,
-         store,
-         localStorage: window.localStorage,
-       });
-       
-       const blob = new Blob(["text"], { type: "image/txt" });
-       const file = new File([blob], "file.txt", { type: "image/txt" });
-       const inputFile = screen.getByTestId("file");
-       const handleChangeFile = jest.fn((e) => myNewBill.handleChangeFile(e));
-       inputFile.addEventListener("change", handleChangeFile);
-       fireEvent.change(inputFile, {
-         target: {
-           files: [file],
-         },
-       });
- 
- 
-       expect(handleChangeFile).toHaveBeenCalledTimes(1);
-       expect(myNewBill.type).toBe(undefined);
-     });
+      document.body.innerHTML = `<div id="root"></div>`;
+      Router();
+    });
 
-     it("Then it should be submitted if everything is correct", async () => {
+    it("Then it should require the input type date", () => {
+      const inputDate = screen.getByTestId("datepicker");
+      expect(inputDate).toBeRequired();
+    });
+    it("Then it should require the input type number amount", () => {
+      const inputAmount = screen.getByTestId("amount");
+      expect(inputAmount).toBeRequired();
+    });
+    it("Then it should require the input type number pct", () => {
+      const inputPct = screen.getByTestId("pct");
+      expect(inputPct).toBeRequired();
+    });
+    it("Then it should require the input type file", () => {
+      const inputfile = screen.getByTestId("file");
+      expect(inputfile).toBeRequired();
+    });
+  });
+
+  describe("When I fill the form", () => {
+    it("Then it should not be submitted if the format is incorrect", async () => {
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+
+      const myNewBill = new NewBill({
+        document,
+        onNavigate,
+        store,
+        localStorage: window.localStorage,
+      });
+
+      const blob = new Blob(["text"], { type: "image/txt" });
+      const file = new File([blob], "file.txt", { type: "image/txt" });
+      const inputFile = screen.getByTestId("file");
+      const handleChangeFile = jest.fn((e) => myNewBill.handleChangeFile(e));
+      inputFile.addEventListener("change", handleChangeFile);
+      fireEvent.change(inputFile, {
+        target: {
+          files: [file],
+        },
+      });
+
+      expect(handleChangeFile).toHaveBeenCalledTimes(1);
+      expect(myNewBill.type).toBe(undefined);
+    });
+
+    it("Then it should be submitted if everything is correct", async () => {
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname });
       };
@@ -98,36 +94,25 @@ import BillsUI from "../views/BillsUI.js";
       const inputFile = screen.getByTestId("file");
       const handleChangeFile = jest.fn((e) => myNewBill.handleChangeFile(e));
       inputFile.addEventListener("change", handleChangeFile);
-      fireEvent.change(inputFile, { target: { files: [file], }, });
+      fireEvent.change(inputFile, { target: { files: [file] } });
       expect(handleChangeFile).toHaveBeenCalledTimes(1);
-      
+
       const formNewBill = screen.getByTestId("form-new-bill");
       fireEvent.submit(formNewBill);
       expect(formNewBill).toBeTruthy();
-     
-      
-
     });
-    
-    
+  });
+});
 
-    
- 
-     
-   });
- });
- 
- // // Quand connecté sur la page employé, la page devrait contenir: envoyer une note de frais
+// // Quand connecté sur la page employé, la page devrait contenir: envoyer une note de frais
 // // Tester l'envoi du file
 // // Quand j'ajoute une image, le nom du file input doit changer
 // // quand j'ajoute un fichier qui n'est pas au bon format, verifier que window.alert.toHaveBeenCalled
 // // En cliquant sur submit, la bills devrait être envoyée
 
-
 describe("Given I am connected as an Employee", () => {
   describe("When I send a new Bill", () => {
-    test("Then it should send datas to Mock API Post", async () => {
-
+    test("Then it should send datas to store", async () => {
       const getSpy = jest.spyOn(store, "post");
       const newBill = {
         id: "47qAXb6fIm2zOKkLzMro",
@@ -145,11 +130,10 @@ describe("Given I am connected as an Employee", () => {
         email: "a@a",
         pct: 20,
       };
-      await store.post(newBill)
+      await store.post(newBill);
       expect(getSpy).toHaveBeenCalledTimes(1);
-    })
+    });
     test("Then if the post fails, it should throw an error 404", async () => {
-
       store.post.mockImplementationOnce(() =>
         Promise.reject(new Error("Erreur 404"))
       );
@@ -158,8 +142,7 @@ describe("Given I am connected as an Employee", () => {
       document.body.innerHTML = html;
       const message = screen.getByText(/Erreur 404/);
       expect(message).toBeTruthy();
-
-    })
+    });
     test("should add a bill to API and fails with 500 message error", async () => {
       store.post.mockImplementationOnce(() =>
         Promise.reject(new Error("Erreur 500"))
@@ -170,5 +153,5 @@ describe("Given I am connected as an Employee", () => {
       const message = screen.getByText(/Erreur 500/);
       expect(message).toBeTruthy();
     });
-  })
-})
+  });
+});
